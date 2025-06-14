@@ -1,6 +1,12 @@
 // Weather Application JavaScript
 class WeatherApp {
     constructor() {
+        // Check if CONFIG is available
+        if (typeof CONFIG === 'undefined') {
+            this.showError('Configuration not loaded. Please refresh the page.');
+            return;
+        }
+        
         // Load configuration from config.js
         this.apiKey = CONFIG.OPENWEATHER_API_KEY;
         this.apiUrl = CONFIG.WEATHER_API_URL;
@@ -9,12 +15,87 @@ class WeatherApp {
         this.currentWeatherData = null;
         this.forecastData = null;
         
+        // Check if API key is available
+        if (!this.apiKey) {
+            this.showApiKeyPrompt();
+            return;
+        }
+        
         this.init();
     }
 
     init() {
         this.bindEvents();
         this.getCurrentLocationWeather();
+    }
+
+    showApiKeyPrompt() {
+        const apiKeyModal = `
+            <div class="modal fade" id="apiKeyModal" tabindex="-1" aria-hidden="true">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title">API Key Required</h5>
+                        </div>
+                        <div class="modal-body">
+                            <p>To use this weather app, you need an OpenWeatherMap API key.</p>
+                            <p><strong>How to get a free API key:</strong></p>
+                            <ol>
+                                <li>Visit <a href="https://openweathermap.org/api" target="_blank">OpenWeatherMap API</a></li>
+                                <li>Sign up for a free account</li>
+                                <li>Go to API Keys section</li>
+                                <li>Copy your API key and paste it below</li>
+                            </ol>
+                            <div class="mb-3">
+                                <label for="apiKeyInput" class="form-label">API Key:</label>
+                                <input type="text" class="form-control" id="apiKeyInput" placeholder="Enter your OpenWeatherMap API key">
+                            </div>
+                            <p><small class="text-muted">Your API key will be stored locally in your browser.</small></p>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-primary" onclick="weatherApp.setApiKeyFromModal()">Save & Continue</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `;
+        
+        document.body.insertAdjacentHTML('beforeend', apiKeyModal);
+        const modal = new bootstrap.Modal(document.getElementById('apiKeyModal'), {
+            backdrop: 'static',
+            keyboard: false
+        });
+        modal.show();
+    }
+
+    setApiKeyFromModal() {
+        const apiKeyInput = document.getElementById('apiKeyInput');
+        const apiKey = apiKeyInput.value.trim();
+        
+        if (!apiKey) {
+            this.showError('Please enter a valid API key.');
+            return;
+        }
+        
+        // Set the API key
+        if (typeof setApiKey === 'function') {
+            setApiKey(apiKey);
+        } else {
+            localStorage.setItem('weatherApiKey', apiKey);
+        }
+        
+        this.apiKey = apiKey;
+        
+        // Close modal and initialize app
+        const modal = bootstrap.Modal.getInstance(document.getElementById('apiKeyModal'));
+        modal.hide();
+        
+        // Remove modal from DOM
+        setTimeout(() => {
+            document.getElementById('apiKeyModal').remove();
+        }, 300);
+        
+        this.init();
     }
 
     bindEvents() {
@@ -511,6 +592,7 @@ styleSheet.textContent = weatherStyles;
 document.head.appendChild(styleSheet);
 
 // Initialize the weather app when DOM is loaded
+let weatherApp;
 document.addEventListener('DOMContentLoaded', () => {
-    new WeatherApp();
+    weatherApp = new WeatherApp();
 });
