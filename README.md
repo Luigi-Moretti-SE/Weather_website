@@ -63,10 +63,21 @@ A comprehensive weather website built to complement the WeatherCast Flutter mobi
 4. Open `http://localhost:8000` in your browser
 
 ### API Configuration
-The website uses OpenWeatherMap API with the key: `7546cf07b2f377377cc1bb8c580c47ef`
-- This is the same API key used in the Flutter application
+The website is configured for GitHub Pages deployment:
+
+#### For GitHub Pages (Live Deployment):
+- The `js/config.js` file is included in the repository without sensitive API keys
+- Users can provide their API key via URL parameter: `https://yourusername.github.io/weather-website/?api_key=YOUR_API_KEY`
+- Or the app will prompt users to enter their API key, which gets stored in browser localStorage
+
+#### For Local Development:
+1. Copy `js/config.local.js` to create your own config file
+2. Add your OpenWeatherMap API key to the copied file
+3. The app will use your local API key for development
+
+**API Key Sources**: OpenWeatherMap API (free tier)
+- Rate limit: 1000 calls/day
 - Supports current weather, forecasts, and geocoding
-- Rate limit: 1000 calls/day (free tier)
 
 ## 📁 Project Structure
 

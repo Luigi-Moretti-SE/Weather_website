@@ -4,11 +4,12 @@
 .env.production
 .env.development
 
-# API keys and configuration
-js/config.js
-config.js
+# API keys and configuration (local development only)
+# js/config.js - COMMENTED OUT for GitHub Pages deployment
+# config.js - COMMENTED OUT for GitHub Pages deployment
 api-keys.txt
 secrets.txt
+config.local.js
 
 # Personal information
 personal-info.txt
