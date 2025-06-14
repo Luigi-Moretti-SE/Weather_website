@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LocalStorage Test - WeatherCast</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+    <div class="container my-5">
+        <h1>LocalStorage Test</h1>
+        
+        <div class="row">
+            <div class="col-md-6">
+                <h3>Test LocalStorage</h3>
+                <button class="btn btn-primary" onclick="testLocalStorage()">Test Save</button>
+                <button class="btn btn-success" onclick="loadLocalStorage()">Load Data</button>
+                <button class="btn btn-danger" onclick="clearLocalStorage()">Clear All</button>
+                
+                <h4 class="mt-4">Current Contact Submissions:</h4>
+                <div id="dataDisplay" class="border p-3 mt-2 bg-light">
+                    <em>Click "Load Data" to see submissions</em>
+                </div>
+            </div>
+            
+            <div class="col-md-6">
+                <h3>Add Test Submission</h3>
+                <form id="testForm">
+                    <div class="mb-3">
+                        <label class="form-label">First Name</label>
+                        <input type="text" class="form-control" id="testFirstName" value="Test">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Last Name</label>
+                        <input type="text" class="form-control" id="testLastName" value="User">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Email</label>
+                        <input type="email" class="form-control" id="testEmail" value="test@example.com">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Subject</label>
+                        <input type="text" class="form-control" id="testSubject" value="Test Message">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Message</label>
+                        <textarea class="form-control" id="testMessage" rows="3">This is a test message to verify localStorage functionality.</textarea>
+                    </div>
+                    <button type="button" class="btn btn-success" onclick="addTestSubmission()">Add Test Submission</button>
+                </form>
+            </div>
+        </div>
+        
+        <div class="row mt-4">
+            <div class="col-12">
+                <div class="alert alert-info">
+                    <h5>Debug Information:</h5>
+                    <div id="debugInfo"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function testLocalStorage() {
+            try {
+                // Test basic localStorage functionality
+                localStorage.setItem('test', 'localStorage is working');
+                const test = localStorage.getItem('test');
+                updateDebugInfo('LocalStorage test: ' + test);
+                localStorage.removeItem('test');
+            } catch (error) {
+                updateDebugInfo('LocalStorage ERROR: ' + error.message);
+            }
+        }
+
+        function loadLocalStorage() {
+            try {
+                const submissions = localStorage.getItem('contactSubmissions');
+                const dataDisplay = document.getElementById('dataDisplay');
+                
+                if (!submissions) {
+                    dataDisplay.innerHTML = '<em>No contact submissions found in localStorage</em>';
+                } else {
+                    const parsed = JSON.parse(submissions);
+                    dataDisplay.innerHTML = `
+                        <strong>Found ${parsed.length} submissions:</strong>
+                        <pre>${JSON.stringify(parsed, null, 2)}</pre>
+                    `;
+                }
+                
+                updateDebugInfo(`LocalStorage contactSubmissions: ${submissions ? 'Found data' : 'No data'}`);
+            } catch (error) {
+                updateDebugInfo('Load ERROR: ' + error.message);
+            }
+        }
+
+        function clearLocalStorage() {
+            if (confirm('Clear all contact submissions?')) {
+                localStorage.removeItem('contactSubmissions');
+                updateDebugInfo('Cleared contactSubmissions from localStorage');
+                loadLocalStorage();
+            }
+        }
+
+        function addTestSubmission() {
+            try {
+                const submission = {
+                    id: Date.now(),
+                    firstName: document.getElementById('testFirstName').value,
+                    lastName: document.getElementById('testLastName').value,
+                    email: document.getElementById('testEmail').value,
+                    phone: '',
+                    subject: document.getElementById('testSubject').value,
+                    message: document.getElementById('testMessage').value,
+                    newsletter: false,
+                    timestamp: new Date().toISOString()
+                };
+
+                // Get existing submissions
+                const submissions = JSON.parse(localStorage.getItem('contactSubmissions') || '[]');
+                
+                // Add new submission
+                submissions.push(submission);
+                
+                // Save back to localStorage
+                localStorage.setItem('contactSubmissions', JSON.stringify(submissions));
+                
+                updateDebugInfo(`Added test submission. Total submissions: ${submissions.length}`);
+                loadLocalStorage();
+                
+                alert('Test submission added successfully!');
+            } catch (error) {
+                updateDebugInfo('Add submission ERROR: ' + error.message);
+            }
+        }
+
+        function updateDebugInfo(message) {
+            const debugInfo = document.getElementById('debugInfo');
+            const timestamp = new Date().toLocaleTimeString();
+            debugInfo.innerHTML += `<div>[${timestamp}] ${message}</div>`;
+        }
+
+        // Load data on page load
+        window.addEventListener('load', () => {
+            loadLocalStorage();
+            testLocalStorage();
+        });
+    </script>
+</body>
+</html>

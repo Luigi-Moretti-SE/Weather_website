@@ -1,0 +1,48 @@
+# Environment variables and sensitive files
+.env
+.env.local
+.env.production
+.env.development
+
+# API keys and configuration
+js/config.js
+config.js
+api-keys.txt
+secrets.txt
+
+# Personal information
+personal-info.txt
+contact-details.txt
+
+# Node modules (if using npm)
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Build outputs
+dist/
+build/
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Logs
+*.log
+
+# Temporary files
+*.tmp
+*.temp

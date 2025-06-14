@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contact Submissions - WeatherCast Admin</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link rel="icon" type="image/svg+xml" href="favicon.svg">
+    <style>
+        .admin-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 2rem 0;
+        }
+        .submission-card {
+            transition: transform 0.2s ease;
+        }
+        .submission-card:hover {
+            transform: translateY(-2px);
+        }
+        .timestamp {
+            font-size: 0.875rem;
+            color: #6c757d;
+        }
+        .empty-state {
+            text-align: center;
+            padding: 4rem 2rem;
+            color: #6c757d;
+        }
+        .export-btn {
+            background: #28a745;
+            border: none;
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 0.375rem;
+            transition: all 0.2s ease;
+        }
+        .export-btn:hover {
+            background: #218838;
+            transform: translateY(-1px);
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <div class="admin-header">
+        <div class="container">
+            <div class="row align-items-center">
+                <div class="col">
+                    <h1 class="mb-0">
+                        <i class="fas fa-envelope me-3"></i>
+                        Contact Submissions
+                    </h1>
+                    <p class="mb-0 mt-2 opacity-75">WeatherCast Admin Panel</p>
+                </div>
+                <div class="col-auto">
+                    <button class="export-btn" onclick="exportSubmissions()">
+                        <i class="fas fa-download me-2"></i>
+                        Export All
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="container my-5">
+        <div class="row">
+            <div class="col-12">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <h2>
+                        <span id="submissionCount">0</span> Submissions
+                    </h2>
+                    <div>
+                        <button class="btn btn-outline-danger" onclick="clearAllSubmissions()">
+                            <i class="fas fa-trash me-2"></i>
+                            Clear All
+                        </button>
+                        <button class="btn btn-outline-secondary ms-2" onclick="refreshSubmissions()">
+                            <i class="fas fa-refresh me-2"></i>
+                            Refresh
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Submissions Container -->
+                <div id="submissionsContainer">
+                    <!-- Submissions will be loaded here -->
+                </div>
+
+                <!-- Empty State -->
+                <div id="emptyState" class="empty-state" style="display: none;">
+                    <i class="fas fa-inbox fa-4x mb-3"></i>
+                    <h3>No submissions yet</h3>
+                    <p>Contact form submissions will appear here when users submit the form.</p>
+                    <a href="contact.html" class="btn btn-primary">
+                        <i class="fas fa-arrow-left me-2"></i>
+                        Go to Contact Form
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <script>
+        class AdminPanel {
+            constructor() {
+                this.loadSubmissions();
+            }            loadSubmissions() {
+                const submissions = JSON.parse(localStorage.getItem('contactSubmissions') || '[]');
+                const container = document.getElementById('submissionsContainer');
+                const emptyState = document.getElementById('emptyState');
+                const countElement = document.getElementById('submissionCount');
+
+                console.log('Admin panel loading submissions...');
+                console.log('Raw localStorage data:', localStorage.getItem('contactSubmissions'));
+                console.log('Parsed submissions:', submissions);
+                console.log('Number of submissions:', submissions.length);
+
+                countElement.textContent = submissions.length;
+
+                if (submissions.length === 0) {
+                    container.innerHTML = '';
+                    emptyState.style.display = 'block';
+                    return;
+                }
+
+                emptyState.style.display = 'none';
+                
+                // Sort submissions by timestamp (newest first)
+                submissions.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+
+                container.innerHTML = submissions.map(submission => this.createSubmissionCard(submission)).join('');
+            }
+
+            createSubmissionCard(submission) {
+                const date = new Date(submission.timestamp);
+                const formattedDate = date.toLocaleDateString() + ' ' + date.toLocaleTimeString();
+
+                return `
+                    <div class="card submission-card mb-3" data-id="${submission.id}">
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-8">
+                                    <h5 class="card-title mb-1">
+                                        ${submission.firstName} ${submission.lastName}
+                                    </h5>
+                                    <div class="timestamp mb-2">
+                                        <i class="fas fa-clock me-1"></i>
+                                        ${formattedDate}
+                                    </div>
+                                    <h6 class="text-primary">${submission.subject}</h6>
+                                    <p class="card-text">${submission.message}</p>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="contact-info">
+                                        <p class="mb-1">
+                                            <i class="fas fa-envelope me-2"></i>
+                                            <a href="mailto:${submission.email}">${submission.email}</a>
+                                        </p>
+                                        ${submission.phone ? `
+                                            <p class="mb-1">
+                                                <i class="fas fa-phone me-2"></i>
+                                                <a href="tel:${submission.phone}">${submission.phone}</a>
+                                            </p>
+                                        ` : ''}
+                                        ${submission.newsletter ? `
+                                            <p class="mb-1 text-success">
+                                                <i class="fas fa-check me-2"></i>
+                                                Newsletter subscribed
+                                            </p>
+                                        ` : ''}
+                                    </div>
+                                    <div class="action-buttons mt-3">
+                                        <button class="btn btn-sm btn-outline-primary me-2" onclick="replyToSubmission('${submission.email}', '${submission.subject}')">
+                                            <i class="fas fa-reply me-1"></i>
+                                            Reply
+                                        </button>
+                                        <button class="btn btn-sm btn-outline-danger" onclick="deleteSubmission(${submission.id})">
+                                            <i class="fas fa-trash me-1"></i>
+                                            Delete
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }
+
+            deleteSubmission(id) {
+                if (confirm('Are you sure you want to delete this submission?')) {
+                    const submissions = JSON.parse(localStorage.getItem('contactSubmissions') || '[]');
+                    const filtered = submissions.filter(sub => sub.id !== id);
+                    localStorage.setItem('contactSubmissions', JSON.stringify(filtered));
+                    this.loadSubmissions();
+                }
+            }
+
+            clearAllSubmissions() {
+                if (confirm('Are you sure you want to delete ALL submissions? This action cannot be undone.')) {
+                    localStorage.removeItem('contactSubmissions');
+                    this.loadSubmissions();
+                }
+            }
+
+            exportSubmissions() {
+                const submissions = JSON.parse(localStorage.getItem('contactSubmissions') || '[]');
+                if (submissions.length === 0) {
+                    alert('No submissions to export.');
+                    return;
+                }
+
+                // Create CSV content
+                const headers = ['First Name', 'Last Name', 'Email', 'Phone', 'Subject', 'Message', 'Newsletter', 'Timestamp'];
+                const csvContent = [
+                    headers.join(','),
+                    ...submissions.map(sub => [
+                        `"${sub.firstName}"`,
+                        `"${sub.lastName}"`,
+                        `"${sub.email}"`,
+                        `"${sub.phone || ''}"`,
+                        `"${sub.subject}"`,
+                        `"${sub.message.replace(/"/g, '""')}"`,
+                        sub.newsletter ? 'Yes' : 'No',
+                        `"${sub.timestamp}"`
+                    ].join(','))
+                ].join('\n');
+
+                // Download CSV
+                const blob = new Blob([csvContent], { type: 'text/csv' });
+                const url = window.URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `contact_submissions_${new Date().toISOString().split('T')[0]}.csv`;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                window.URL.revokeObjectURL(url);
+            }
+        }
+
+        // Global functions
+        function deleteSubmission(id) {
+            adminPanel.deleteSubmission(id);
+        }
+
+        function clearAllSubmissions() {
+            adminPanel.clearAllSubmissions();
+        }
+
+        function refreshSubmissions() {
+            adminPanel.loadSubmissions();
+        }
+
+        function exportSubmissions() {
+            adminPanel.exportSubmissions();
+        }
+
+        function replyToSubmission(email, subject) {
+            const mailtoLink = `mailto:${email}?subject=Re: ${encodeURIComponent(subject)}`;
+            window.location.href = mailtoLink;
+        }
+
+        // Initialize admin panel
+        const adminPanel = new AdminPanel();
+    </script>
+</body>
+</html>

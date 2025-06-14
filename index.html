@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">    <title>WeatherCast - Your Weather Companion</title>
+    <link rel="icon" type="image/svg+xml" href="favicon.svg">
+    
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome Icons -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Custom CSS -->
+    <link href="./css/style.css" rel="stylesheet">
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-dark fixed-top">
+        <div class="container">
+            <a class="navbar-brand" href="#home">
+                <i class="fas fa-cloud-sun me-2"></i>
+                WeatherCast
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link active" href="#home">Home</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#forecast">Forecast</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="./about.html">About Us</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="./contact.html">Contact</a>
+                    </li>
+                    <li class="nav-item">
+                        <button class="btn btn-outline-light btn-sm ms-2" id="unitToggle">°F</button>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section id="home" class="hero-section">
+        <div class="hero-overlay">
+            <div class="container">
+                <div class="row justify-content-center text-center">
+                    <div class="col-lg-8">
+                        <h1 class="hero-title">Weather Forecast</h1>
+                        <p class="hero-subtitle">Get accurate weather information for any location worldwide</p>
+                        
+                        <!-- Search Bar -->
+                        <div class="search-container mt-4">
+                            <div class="input-group">
+                                <input type="text" id="cityInput" class="form-control search-input" 
+                                       placeholder="Enter city name...">
+                                <button class="btn btn-primary" id="searchBtn" type="button">
+                                    <i class="fas fa-search me-2"></i>Search
+                                </button>
+                                <button class="btn btn-secondary" id="locationBtn" type="button">
+                                    <i class="fas fa-location-arrow me-2"></i>My Location
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Current Weather Section -->
+    <section id="current-weather" class="py-5">
+        <div class="container">
+            <div class="row justify-content-center">
+                <div class="col-lg-10">
+                    <div class="weather-card" id="currentWeatherCard" style="display: none;">
+                        <div class="row align-items-center">
+                            <div class="col-md-6">
+                                <div class="weather-main">
+                                    <h2 id="cityName" class="city-name">Loading...</h2>
+                                    <div class="temperature-display">
+                                        <span id="currentTemp" class="temperature">--°</span>
+                                        <div class="weather-icon">
+                                            <i id="weatherIcon" class="fas fa-sun"></i>
+                                        </div>
+                                    </div>
+                                    <p id="weatherDescription" class="weather-description">Clear Sky</p>
+                                    <p id="feelsLike" class="feels-like">Feels like --°</p>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="weather-details">
+                                    <div class="row">
+                                        <div class="col-6">
+                                            <div class="detail-item">
+                                                <i class="fas fa-thermometer-half text-danger"></i>
+                                                <span class="detail-label">High</span>
+                                                <span id="highTemp" class="detail-value">--°</span>
+                                            </div>
+                                        </div>
+                                        <div class="col-6">
+                                            <div class="detail-item">
+                                                <i class="fas fa-thermometer-quarter text-primary"></i>
+                                                <span class="detail-label">Low</span>
+                                                <span id="lowTemp" class="detail-value">--°</span>
+                                            </div>
+                                        </div>
+                                        <div class="col-6">
+                                            <div class="detail-item">
+                                                <i class="fas fa-tint text-info"></i>
+                                                <span class="detail-label">Humidity</span>
+                                                <span id="humidity" class="detail-value">--%</span>
+                                            </div>
+                                        </div>
+                                        <div class="col-6">
+                                            <div class="detail-item">
+                                                <i class="fas fa-wind text-success"></i>
+                                                <span class="detail-label">Wind</span>
+                                                <span id="windSpeed" class="detail-value">-- km/h</span>
+                                            </div>
+                                        </div>
+                                        <div class="col-6">
+                                            <div class="detail-item">
+                                                <i class="fas fa-eye text-warning"></i>
+                                                <span class="detail-label">Visibility</span>
+                                                <span id="visibility" class="detail-value">-- km</span>
+                                            </div>
+                                        </div>
+                                        <div class="col-6">
+                                            <div class="detail-item">
+                                                <i class="fas fa-tachometer-alt text-secondary"></i>
+                                                <span class="detail-label">Pressure</span>
+                                                <span id="pressure" class="detail-value">-- hPa</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Forecast Section -->
+    <section id="forecast" class="py-5 bg-light">
+        <div class="container">
+            <h2 class="text-center mb-4">Weather Forecast</h2>
+            
+            <!-- Forecast Toggle -->
+            <div class="text-center mb-4">
+                <div class="btn-group" role="group">
+                    <button type="button" class="btn btn-outline-primary active" id="weeklyBtn">7-Day Forecast</button>
+                    <button type="button" class="btn btn-outline-primary" id="monthlyBtn">Monthly Forecast</button>
+                </div>
+            </div>
+
+            <!-- Weekly Forecast -->
+            <div id="weeklyForecast" class="row forecast-container">
+                <!-- Forecast cards will be populated here -->
+            </div>
+
+            <!-- Monthly Chart -->
+            <div id="monthlyChart" style="display: none;">
+                <div class="chart-container">
+                    <canvas id="temperatureChart"></canvas>
+                </div>
+            </div>        </div>    </section>
+
+    <!-- Loading Spinner -->
+    <div id="loadingSpinner" class="loading-overlay" style="display: none;">
+        <div class="spinner-border text-primary" role="status">
+            <span class="visually-hidden">Loading...</span>
+        </div>
+    </div>
+
+    <!-- Error Alert -->
+    <div id="errorAlert" class="alert alert-danger alert-dismissible fade" role="alert" style="position: fixed; top: 80px; right: 20px; z-index: 1050; display: none;">
+        <span id="errorMessage"></span>
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Configuration -->
+    <script src="./js/config.js"></script>
+    <!-- Custom JS -->
+    <script src="./js/weather.js"></script>
+</body>
+</html>
